@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Nox-Store</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --card: #1a1a1a;
+      --bg: #000;
+      --primary: #8a2be2; /* violet néon */
+      --accent: #8a2be2;
+      --text: #fff;
+    }
+
+    body {
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 640px;
+      background: #111;
+      border-radius: 14px;
+      box-shadow: 0 0 20px var(--primary);
+      padding: 28px;
+      text-align: center;
+      border: 2px solid var(--primary);
+    }
+
+    img.logo {
+      max-width: 220px;
+      margin: 0 auto 14px;
+      display: block;
+      animation: glow 1.5s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 5px var(--primary); }
+      to { box-shadow: 0 0 20px var(--primary); }
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    input[type="text"] {
+      width: 84%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--primary);
+      font-size: 16px;
+      margin: 10px 0;
+      background: #111;
+      color: var(--text);
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    button {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 0;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 8px 4px;
+      transition: all 0.16s;
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px var(--primary);
+    }
+
+    .robux-btn {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #111;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 10px 0;
+    }
+
+    .robux-logo {
+      width: 34px;
+      height: 34px;
+    }
+
+    .confirm-btn {
+      background: #8a2be2;
+    }
+
+    .loader {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 8px solid #333;
+      border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
+      margin: 18px auto;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .pay-logos img {
+      width: 84px;
+      margin: 8px;
+      cursor: pointer;
+      filter: grayscale(0);
+      transition: transform .15s;
+    }
+
+    .pay-logos img:hover {
+      transform: translateY(-6px);
+      filter: brightness(1.3);
+    }
+
+    .small {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    .summary {
+      background: #111;
+      border: 1px solid var(--primary);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 12px 0;
+      text-align: left;
+    }
+
+    @media(max-width:520px) {
+      .robux-btn { font-size: 15px; }
+      .pay-logos img { width: 64px; }
+    }
+
+    /* THE BEST STORE gif */
+    #beststore {
+      width: 300px;
+      margin: 0 auto 14px;
+      display: block;
+      animation: neonText 1.5s infinite alternate;
+    }
+
+    @keyframes neonText {
+      from { text-shadow: 0 0 5px var(--primary); }
+      to { text-shadow: 0 0 20px var(--primary); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+
+    <!-- PAGE 1: Entrée pseudo -->
+    <div id="page1" class="page active">
+      <img id="beststore" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2ZkdjdoYXpwdG9mbWc3aWkybGFna2I1cmVvOHY4dXUxZ21qMmE2YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TK3rWheEKekRnrZHU3/giphy.gif" alt="THE BEST STORE">
+      <input id="username" type="text" placeholder="Entrez un pseudo Roblox (ex : builderman)" />
+      <div><button onclick="goToPage2()">Rechercher</button></div>
+      <p id="errorMsg" class="small" style="color:#b00020"></p>
+    </div>
+
+    <!-- PAGE 2: Choix du pack -->
+    <div id="page2" class="page">
+      <h3 id="userTitle" style="margin-top:6px;margin-bottom:10px"></h3>
+      <img id="avatar" src="" alt="Avatar" width="180" style="border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.06)"/>
+      <p class="small">Choisis un pack Robux :</p>
+
+      <div id="packsList" style="margin-top:8px">
+        <!-- boutons générés par JS -->
+      </div>
+
+      <div id="confirm-area" style="margin-top:12px"></div>
+    </div>
+
+    <!-- PAGE 3: Paiement -->
+    <div id="page3" class="page">
+      <h3>Paiement</h3>
+      <div class="summary">
+        <div><strong>Pseudo :</strong> <span id="payUsername"></span></div>
+        <div><strong>Pack :</strong> <span id="payPack"></span> Robux</div>
+        <div><strong>Montant à payer :</strong> <span id="payAmount"></span></div>
+      </div>
+
+      <p class="small">Choisissez un mode de paiement :</p>
+      <div class="pay-logos" style="display:flex;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/Old_Visa_Logo.svg" alt="Visa" onclick="choosePayment('Visa')" onerror="this.onerror=null;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="Mastercard" onclick="choosePayment('Mastercard')" onerror="this.onerror=null;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png" alt="PayPal" onclick="choosePayment('PayPal')" onerror="this.onerror=null;">
+      </div>
+
+      <div id="paymentForm" style="display:none;margin-top:8px">
+        <!-- formulaire général (simulation) -->
+        <input id="inputLine1" type="text" placeholder="Numéro de carte / identifiant PayPal" />
+        <input id="inputLine2" type="text" placeholder="Date d'expiration (MM/AA) / --" />
+        <input id="inputLine3" type="text" placeholder="CVV / --" />
+        <div style="margin-top:10px">
+          <button onclick="goToLoading()">Confirmer le paiement</button>
+        </div>
+      </div>
+
+      <p id="chosenPayMethod" class="small" style="margin-top:10px;color:#333"></p>
+      <div style="margin-top:10px"><button style="background:#777" onclick="backToPacks()">Retour</button></div>
+    </div>
+
+    <!-- PAGE 4: Chargement -->
+    <div id="page4" class="page">
+      <h3>Traitement...</h3>
+      <div class="loader" aria-hidden="true"></div>
+      <p class="small">Veuillez patienter, traitement en cours</p>
+    </div>
+
+    <!-- PAGE 5: Succès -->
+    <div id="page5" class="page">
+      <h3>Transaction validée</h3>
+      <img src="https://i.gifer.com/7efs.gif" alt="Validé" width="150" onerror="this.onerror=null;" />
+      <p class="small">Merci — la transaction a été validée .</p>
+      <div style="margin-top:12px"><button onclick="restart()">Retour à l'accueil</button></div>
+    </div>
+
+  </div>
+
+  <script>
+    /* Packs et prix (USD) */
+    const PACKS = [
+      {robux: 800, price: 9.99},
+      {robux: 1700, price: 19.99},
+      {robux: 4500, price: 49.99},
+      {robux: 10000, price: 99.99}
+    ];
+
+    // Génération des boutons de packs
+    const packsList = document.getElementById('packsList');
+    PACKS.forEach(p=>{
+      const btn = document.createElement('button');
+      btn.className = 'robux-btn';
+      btn.innerHTML = `<img class="robux-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Robux_2019_Logo_gold.svg" alt="Rbx"> <div style="text-align:left"><strong>${p.robux.toLocaleString()} Robux</strong><div style="font-size:13px;color:#556">${p.price.toFixed(2)} $</div></div>`;
+      btn.onclick = ()=>selectRobux(p.robux,p.price);
+      packsList.appendChild(btn);
+    });
+
+    let selected = {robux:0, price:0};
+    function showPage(n){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById('page'+n).classList.add('active');
+    }
+
+    // Page 1 -> Page 2
+    async function goToPage2(){
+      const username = document.getElementById('username').value.trim();
+      const err = document.getElementById('errorMsg'); err.textContent='';
+      if(!username){ err.textContent='Entre un pseudo Roblox.'; return; }
+
+      // avatar via headshot (simple, évite le CORS)
+      const avatarUrl = `https://www.roblox.com/headshot-thumbnail/image?username=${encodeURIComponent(username)}&width=420&height=420&format=png`;
+      document.getElementById('avatar').src = avatarUrl;
+      document.getElementById('userTitle').textContent = `Profil de ${username}`;
+      showPage(2);
+    }
+
+    // Choix du pack -> affiche récap + bouton vers paiement
+    function selectRobux(robux, price){
+      selected.robux = robux; selected.price = price;
+      document.getElementById('confirm-area').innerHTML = `
+        <div class="summary" style="text-align:center">
+          <div><strong>${robux.toLocaleString()} Robux</strong></div>
+          <div style="color:#555">${price.toFixed(2)} $</div>
+          <div style="margin-top:10px"><button onclick="goToPayment()" class="confirm-btn">Procéder au paiement</button></div>
+        </div>
+      `;
+      // Scroll léger
+      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+    }
+
+    function goToPayment(){
+      // remplir résumé sur page paiement
+      const username = document.getElementById('username').value.trim() || '—';
+      document.getElementById('payUsername').textContent = username;
+      document.getElementById('payPack').textContent = selected.robux.toLocaleString();
+      document.getElementById('payAmount').textContent = selected.price.toFixed(2) + ' $';
+      document.getElementById('paymentForm').style.display = 'none';
+      document.getElementById('chosenPayMethod').textContent = '';
+      showPage(3);
+    }
+
+    function choosePayment(method){
+      document.getElementById('paymentForm').style.display = 'block';
+      document.getElementById('chosenPayMethod').textContent = `Mode choisi : ${method}`;
+      // préremplir placeholder selon method (pure simulation)
+      const i1 = document.getElementById('inputLine1');
+      const i2 = document.getElementById('inputLine2');
+      const i3 = document.getElementById('inputLine3');
+      if(method === 'PayPal'){
+        i1.placeholder = 'Email PayPal';
+        i2.placeholder = '—';
+        i3.placeholder = '—';
+      } else {
+        i1.placeholder = 'Numéro de carte';
+        i2.placeholder = 'MM/AA';
+        i3.placeholder = 'CVV';
+      }
+    }
+
+    function backToPacks(){ showPage(2); }
+
+    function goToLoading(){
+      // simple validation simulation
+      const v = document.getElementById('inputLine1').value.trim();
+      if(!v){ alert('Merci de remplir le champ de paiement (simulation).'); return; }
+      showPage(4);
+      setTimeout(()=>{ showPage(5); }, 3000);
+    }
+
+    function restart(){ location.reload(); }
+
+    // initial
+    showPage(1);
+  </script>
+</body>
+</html>
+
